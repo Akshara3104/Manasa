@@ -19,8 +19,6 @@ export default function AdminPage() {
 
   const [form, setForm] = useState({
     productName: '',
-    manufacturingDate: '',
-    expiryDate: '',
     manufacturingLocation: 'Manasa Dairy Plant, Andhra Pradesh',
     quantity: '',
     notes: ''
@@ -75,8 +73,8 @@ export default function AdminPage() {
 
   const createBatch = async (e) => {
     e.preventDefault();
-    if (!form.productName || !form.manufacturingDate || !form.expiryDate || !form.manufacturingLocation) {
-      return toast.error('Fill all required fields');
+    if (!form.productName || !form.manufacturingLocation) {
+      return toast.error('Product name and manufacturing location are required');
     }
     setCreating(true);
     try {
@@ -150,7 +148,7 @@ export default function AdminPage() {
       <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold text-blue-950">Admin Dashboard</h1>
-          <p className="text-sm text-slate-600">Create and manage manufacturing batches.</p>
+          <p className="text-sm text-slate-600">Create batches and generate QR codes.</p>
         </div>
         <Button onClick={logout} variant="outline" className="border-blue-200 text-blue-800 hover:bg-blue-50">
           <LogOut className="mr-2 h-4 w-4" /> Logout
@@ -168,27 +166,17 @@ export default function AdminPage() {
                 <Label>Product Name*</Label>
                 <Input value={form.productName} onChange={(e) => setForm({ ...form, productName: e.target.value })} placeholder="e.g. Toned Milk 1L" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label>Manufacturing Date*</Label>
-                  <Input type="date" value={form.manufacturingDate} onChange={(e) => setForm({ ...form, manufacturingDate: e.target.value })} />
-                </div>
-                <div>
-                  <Label>Expiry Date*</Label>
-                  <Input type="date" value={form.expiryDate} onChange={(e) => setForm({ ...form, expiryDate: e.target.value })} />
-                </div>
-              </div>
               <div>
                 <Label>Manufacturing Location*</Label>
-                <Input value={form.manufacturingLocation} onChange={(e) => setForm({ ...form, manufacturingLocation: e.target.value })} />
+                <Input value={form.manufacturingLocation} onChange={(e) => setForm({ ...form, manufacturingLocation: e.target.value })} placeholder="e.g. Manasa Dairy Plant, Andhra Pradesh" />
               </div>
               <div>
-                <Label>Quantity</Label>
+                <Label>Quantity (optional)</Label>
                 <Input value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} placeholder="e.g. 500 units" />
               </div>
               <div>
-                <Label>Notes</Label>
-                <Textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Optional batch notes" />
+                <Label>Notes (optional)</Label>
+                <Textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Internal notes (not shown on QR page)" />
               </div>
               <Button type="submit" disabled={creating} className="w-full bg-blue-900 hover:bg-blue-800">
                 {creating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />} Create Batch & QR
@@ -238,10 +226,8 @@ export default function AdminPage() {
                         <span className="font-semibold text-blue-950">{b.productName}</span>
                         <Badge className="bg-blue-900 hover:bg-blue-800">{b.batchNumber}</Badge>
                       </div>
-                      <div className="mt-1 text-xs text-slate-500">
-                        Mfg: {b.manufacturingDate} • Exp: {b.expiryDate}
-                      </div>
                       <div className="mt-1 text-xs text-slate-500 truncate">📍 {b.manufacturingLocation}</div>
+                      {b.quantity && <div className="text-xs text-slate-500">Qty: {b.quantity}</div>}
                     </div>
                     <div className="flex gap-2">
                       <Button size="sm" variant="outline" onClick={() => download(b.qrDataUrl, `${b.batchNumber}.png`)} className="border-blue-200 text-blue-800">

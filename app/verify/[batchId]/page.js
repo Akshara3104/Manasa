@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, XCircle, Loader2, Milk, Calendar, MapPin, Hash, AlertTriangle, ShieldCheck, Package } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, Milk, MapPin, Hash, AlertTriangle, ShieldCheck, Package } from 'lucide-react';
 
 export default function VerifyBatchPage() {
   const { batchId } = useParams();
@@ -35,7 +35,6 @@ export default function VerifyBatchPage() {
   }
 
   const authentic = data?.authentic;
-  const expired = data?.expired;
   const found = data?.found;
   const b = data?.batch;
 
@@ -46,8 +45,8 @@ export default function VerifyBatchPage() {
           <div className="flex items-center gap-4">
             {authentic ? <CheckCircle2 className="h-14 w-14" /> : <XCircle className="h-14 w-14" />}
             <div>
-              <h1 className="text-3xl font-bold">{authentic ? 'Authentic Product' : found ? (expired ? 'Product Expired' : 'Not Authentic') : 'Product Not Found'}</h1>
-              <p className="mt-1 text-white/90">{authentic ? 'This product is verified by Manasa Dairy.' : found ? (expired ? 'This batch is past its expiry date.' : 'This batch could not be validated.') : 'This QR code does not match any Manasa Dairy batch.'}</p>
+              <h1 className="text-3xl font-bold">{authentic ? 'Authentic Product' : 'Product Not Found'}</h1>
+              <p className="mt-1 text-white/90">{authentic ? 'This product is verified by Manasa Dairy.' : 'This QR code does not match any Manasa Dairy batch.'}</p>
             </div>
           </div>
         </div>
@@ -62,25 +61,25 @@ export default function VerifyBatchPage() {
               <h2 className="mt-2 text-2xl font-bold text-blue-950">{b.productName}</h2>
               <div className="mt-1 flex flex-wrap gap-2">
                 <Badge className="bg-blue-900 hover:bg-blue-800">{b.batchNumber}</Badge>
-                {expired && <Badge variant="destructive">Expired</Badge>}
-                {!expired && <Badge className="bg-emerald-600 hover:bg-emerald-700">Valid</Badge>}
+                <Badge className="bg-emerald-600 hover:bg-emerald-700">Verified</Badge>
+              </div>
+
+              <div className="mt-8 rounded-2xl border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-white p-6">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-900 text-white shadow-lg">
+                    <MapPin className="h-7 w-7" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-widest text-blue-800">Manufactured At</div>
+                    <div className="mt-1 text-xl font-bold text-blue-950">{b.manufacturingLocation}</div>
+                  </div>
+                </div>
               </div>
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <Row icon={Hash} label="Batch Number" value={b.batchNumber} />
                 <Row icon={Package} label="Product" value={b.productName} />
-                <Row icon={Calendar} label="Manufactured On" value={formatDate(b.manufacturingDate)} />
-                <Row icon={Calendar} label="Expires On" value={formatDate(b.expiryDate)} />
-                <Row icon={MapPin} label="Manufacturing Location" value={b.manufacturingLocation} className="sm:col-span-2" />
-                {b.quantity && <Row icon={Package} label="Quantity" value={b.quantity} />}
+                <Row icon={Hash} label="Batch Number" value={b.batchNumber} />
               </div>
-
-              {b.notes && (
-                <div className="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-slate-700">
-                  <div className="mb-1 text-xs font-semibold uppercase text-blue-800">Batch Notes</div>
-                  {b.notes}
-                </div>
-              )}
 
               <div className="mt-6 flex items-center gap-2 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
                 <ShieldCheck className="h-5 w-5 text-blue-800" />
@@ -121,11 +120,4 @@ function Row({ icon: Icon, label, value, className = '' }) {
       </div>
     </div>
   );
-}
-
-function formatDate(d) {
-  if (!d) return '—';
-  try {
-    return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-  } catch { return d; }
 }

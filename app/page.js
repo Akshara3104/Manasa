@@ -53,7 +53,7 @@ export default function HomePage() {
           <div className="relative">
             <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border-8 border-white shadow-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1597616456860-df68738ec8e4?auto=format&fit=crop&w=1200&q=80"
+                src="https://images.unsplash.com/photo-1662748716829-33624b1d5dfe?auto=format&fit=crop&w=1200&q=80"
                 alt="Dairy cow on green pasture"
                 fill
                 className="object-cover"
@@ -110,8 +110,8 @@ export default function HomePage() {
             </p>
             <ul className="mt-5 space-y-2 text-blue-50">
               <li className="flex gap-2"><CheckCircle2 className="h-5 w-5 shrink-0" /> Product name & batch number</li>
-              <li className="flex gap-2"><CheckCircle2 className="h-5 w-5 shrink-0" /> Manufacturing date & location</li>
-              <li className="flex gap-2"><CheckCircle2 className="h-5 w-5 shrink-0" /> Expiry date & authenticity status</li>
+              <li className="flex gap-2"><CheckCircle2 className="h-5 w-5 shrink-0" /> Manufacturing location</li>
+              <li className="flex gap-2"><CheckCircle2 className="h-5 w-5 shrink-0" /> Authenticity guaranteed</li>
             </ul>
             <div className="mt-6">
               <Link href="/verify">
@@ -143,8 +143,8 @@ export default function HomePage() {
           {[
             { name: 'Toned Milk', img: 'https://images.unsplash.com/photo-1567011345445-fd175f248019?auto=format&fit=crop&w=800&q=80' },
             { name: 'Fresh Curd', img: 'https://images.unsplash.com/photo-1609983507346-8d282af67df7?auto=format&fit=crop&w=800&q=80' },
-            { name: 'Pure Ghee', img: 'https://images.unsplash.com/photo-1592241140495-4f376ad04977?auto=format&fit=crop&w=800&q=80' },
-            { name: 'Paneer', img: 'https://images.unsplash.com/photo-1618932346918-003de628dd37?auto=format&fit=crop&w=800&q=80' }
+            { name: 'Pure Ghee', img: 'https://images.unsplash.com/photo-1646562292849-0cce895b8a62?auto=format&fit=crop&w=800&q=80' },
+            { name: 'Paneer', img: 'https://images.unsplash.com/photo-1564759298141-cef86f51d4d4?auto=format&fit=crop&w=800&q=80' }
           ].map((p) => (
             <Card key={p.name} className="group overflow-hidden border-blue-100">
               <div className="relative aspect-square overflow-hidden">

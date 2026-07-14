@@ -60,13 +60,13 @@ async function handle(request, { params }) {
     if (route === '/batches' && method === 'POST') {
       if (!checkAuth(request)) return json({ error: 'Unauthorized' }, 401);
       const body = await readBody(request);
-      const { productName, manufacturingDate, manufacturingLocation, expiryDate, quantity, notes } = body;
-      if (!productName || !manufacturingDate || !manufacturingLocation || !expiryDate) {
-        return json({ error: 'Missing required fields' }, 400);
+      const { productName, manufacturingLocation, quantity, notes } = body;
+      if (!productName || !manufacturingLocation) {
+        return json({ error: 'Product name and manufacturing location are required' }, 400);
       }
       const id = uuidv4();
-      // Human-friendly batch number: MD-YYYYMMDD-XXXX
-      const dateStr = manufacturingDate.replaceAll('-', '');
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0, 10).replaceAll('-', '');
       const short = id.split('-')[0].toUpperCase();
       const batchNumber = `MD-${dateStr}-${short}`;
       const verifyUrl = `${BASE_URL}/verify/${id}`;
@@ -75,15 +75,13 @@ async function handle(request, { params }) {
         id,
         batchNumber,
         productName,
-        manufacturingDate,
         manufacturingLocation,
-        expiryDate,
         quantity: quantity || '',
         notes: notes || '',
         verifyUrl,
         qrDataUrl,
         authentic: true,
-        createdAt: new Date().toISOString()
+        createdAt: now.toISOString()
       };
       await db.collection('batches').insertOne(batch);
       return json({ success: true, batch });
@@ -111,8 +109,7 @@ async function handle(request, { params }) {
       if (!b) {
         return json({ found: false, authentic: false, error: 'Batch not found. This product may not be genuine.' }, 404);
       }
-      const expired = new Date(b.expiryDate) < new Date();
-      return json({ found: true, authentic: !expired, expired, batch: b });
+      return json({ found: true, authentic: true, batch: b });
     }
 
     // CONTACT SUBMISSIONS

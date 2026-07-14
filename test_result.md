@@ -122,6 +122,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ TESTED: Both success and failure cases working correctly. Correct credentials (admin/manasa2025) return 200 with success=true and token. Wrong credentials return 401 with success=false."
+        - working: true
+          agent: "testing"
+          comment: "✅ RE-TESTED (Simplified API): Admin login still working correctly after batch API simplification. Correct credentials return 200 with token, wrong credentials return 401."
 
   - task: "Create batch with QR (POST /api/batches, auth required)"
     implemented: true
@@ -137,6 +140,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ TESTED: All scenarios working. Without auth returns 401. With auth creates batch successfully with correct batchNumber format (MD-20260601-B340AA95), qrDataUrl starting with 'data:image/png;base64,', verifyUrl, and all required fields. Missing required fields returns 400."
+        - working: true
+          agent: "testing"
+          comment: "✅ RE-TESTED (Simplified API): Batch creation SIMPLIFIED - now ONLY requires productName + manufacturingLocation (dates removed). Batch response does NOT contain manufacturingDate or expiryDate fields. Auth validation working (401 without token). Creates batch with correct batchNumber format (MD-20260714-EB97674B), qrDataUrl (data:image/png;base64,...), verifyUrl. Missing required fields returns 400."
 
   - task: "List batches (GET /api/batches, auth required)"
     implemented: true
@@ -152,6 +158,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ TESTED: Working correctly. Without auth returns 401. With auth returns 200 with batches array containing all created batches including the test batch."
+        - working: true
+          agent: "testing"
+          comment: "✅ RE-TESTED (Simplified API): List batches working correctly. Auth validation working (401 without token). Returns batches array with NO date fields (manufacturingDate, expiryDate removed)."
 
   - task: "Delete batch (DELETE /api/batches/{id}, auth required)"
     implemented: true
@@ -167,6 +176,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ TESTED: Working correctly. Without auth returns 401. With auth deletes batch successfully (returns 200 with success=true). Verified deletion by checking GET /api/verify/{id} returns 404 after deletion."
+        - working: true
+          agent: "testing"
+          comment: "✅ RE-TESTED (Simplified API): Delete batch working correctly. Auth validation working (401 without token). Deletes successfully (200 with success=true). Verified deletion - GET /api/verify/{id} returns 404 after deletion."
 
   - task: "Public verify (GET /api/verify/{id})"
     implemented: true
@@ -182,6 +194,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ TESTED: All scenarios working. Valid batch returns 200 with found=true, authentic=true, expired=false, and complete batch details. Nonexistent ID returns 404 with found=false, authentic=false. Expired batch (expiryDate in past) returns 200 with found=true, authentic=false, expired=true."
+        - working: true
+          agent: "testing"
+          comment: "✅ RE-TESTED (Simplified API): Public verify SIMPLIFIED - NO expiry checking. Valid batch returns 200 with found=true, authentic=true, batch details. Response does NOT contain 'expired' field. Batch does NOT contain manufacturingDate or expiryDate fields. Nonexistent ID returns 404 with found=false, authentic=false."
 
   - task: "Contact form (POST /api/contact)"
     implemented: true
@@ -197,6 +212,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ TESTED: Working correctly. Valid submission with name, email, phone, message returns 200 with success=true. Missing required fields (name or message) returns 400 with error message."
+        - working: true
+          agent: "testing"
+          comment: "✅ RE-TESTED (Simplified API): Contact form still working correctly after batch API simplification. Valid submission returns 200 with success=true. Missing required fields returns 400."
 
 frontend:
   - task: "All pages render (Home, About, Products, Quality, Gallery, Contact, Verify, Admin, Verify batch detail)"
@@ -214,7 +232,7 @@ frontend:
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: false
 
 test_plan:
@@ -276,3 +294,35 @@ agent_communication:
         Base URL tested: https://dairy-dashboard-22.preview.emergentagent.com/api
         
         NO CRITICAL ISSUES FOUND. All backend functionality is working as expected.
+    - agent: "testing"
+      message: |
+        ✅ RE-TESTING COMPLETE - SIMPLIFIED BATCH API VERIFIED (14/14 - 100%)
+        
+        Re-tested backend after batch API simplification (dates removed). All endpoints working correctly:
+        
+        SIMPLIFIED BATCH API CHANGES VERIFIED:
+        • POST /api/batches now ONLY requires productName + manufacturingLocation (NO dates)
+        • Batch responses do NOT contain manufacturingDate or expiryDate fields
+        • GET /api/verify/{id} does NOT return 'expired' field (no expiry checking)
+        • All other functionality remains intact
+        
+        DETAILED RE-TEST RESULTS:
+        1. Admin login success: ✅ Returns 200 with token
+        2. Admin login failure: ✅ Returns 401
+        3. Create batch without auth: ✅ Returns 401
+        4. Create batch with auth: ✅ Creates batch with batchNumber (MD-20260714-EB97674B), qrDataUrl, verifyUrl, NO date fields
+        5. Create batch missing manufacturingLocation: ✅ Returns 400
+        6. List batches without auth: ✅ Returns 401
+        7. List batches with auth: ✅ Returns batches array, NO date fields in batches
+        8. Verify existing batch: ✅ Returns 200 with found=true, authentic=true, NO 'expired' field, NO date fields in batch
+        9. Verify non-existent batch: ✅ Returns 404 with found=false, authentic=false
+        10. Delete batch without auth: ✅ Returns 401
+        11. Delete batch with auth: ✅ Returns 200 with success=true
+        12. Verify deleted batch: ✅ Returns 404
+        13. Contact form valid: ✅ Returns 200 with success=true
+        14. Contact form missing message: ✅ Returns 400
+        
+        Test file: /app/backend_test.py (updated)
+        Base URL: https://dairy-dashboard-22.preview.emergentagent.com/api
+        
+        NO CRITICAL ISSUES FOUND. Simplified batch API is working as expected.

@@ -16,7 +16,7 @@ export default function AboutPage() {
 
       <section className="container mx-auto grid gap-10 px-4 py-16 md:grid-cols-2 md:items-center">
         <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl">
-          <Image src="https://images.unsplash.com/photo-1570460988350-23e05c32c45c?auto=format&fit=crop&w=1200&q=80" alt="Farm" fill className="object-cover" />
+          <Image src="https://images.unsplash.com/photo-1523473827533-2a64d0d36748?auto=format&fit=crop&w=1200&q=80" alt="Farm" fill className="object-cover" />
         </div>
         <div>
           <h2 className="text-3xl font-bold text-blue-950">Our Story</h2>
