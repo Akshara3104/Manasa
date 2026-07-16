@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { MongoClient } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 
-const MONGO_URL = process.env.MONGO_URL;
+const MONGODB_URI = process.env.MONGODB_URI;
 const DB_NAME = process.env.DB_NAME && process.env.DB_NAME !== 'your_database_name' ? process.env.DB_NAME : 'manasa';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'manasa2025';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
@@ -34,7 +34,7 @@ function sanitizeMongoUrl(url) {
   return proto + user + ':' + pass + hostAndRest;
 }
 
-const EFFECTIVE_MONGO_URL = sanitizeMongoUrl(MONGO_URL);
+const EFFECTIVE_MONGO_URI = sanitizeMongoUrl(MONGODB_URI);
 
 const DEFAULT_UNIT = {
   id: 'seed-unit-001',
@@ -50,7 +50,7 @@ const DEFAULT_UNIT = {
 let cachedClient = null;
 async function getDb() {
   if (!cachedClient) {
-    cachedClient = new MongoClient(EFFECTIVE_MONGO_URL);
+    cachedClient = new MongoClient(EFFECTIVE_MONGO_URI);
     await cachedClient.connect();
   }
   return cachedClient.db(DB_NAME);
