@@ -120,13 +120,31 @@ console.log("Response body:", j);
   };
 
   const deleteUnit = async (id) => {
-    if (!confirm('Delete this manufacturing unit?')) return;
-    try {
-      await fetch(`/api/units/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
-      loadUnits();
+  if (!confirm('Delete this manufacturing unit?')) return;
+
+  try {
+    const res = await fetch(`/api/units/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+
+    console.log(data);
+
+    if (res.ok && data.success) {
       toast.success('Deleted');
-    } catch { toast.error('Failed'); }
-  };
+      loadUnits();
+    } else {
+      toast.error(data.error || 'Delete failed');
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error('Network error');
+  }
+};
 
   if (!token) {
     return (
