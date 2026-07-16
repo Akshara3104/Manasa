@@ -56,12 +56,12 @@ async function getDb() {
   return cachedClient.db(DB_NAME);
 }
 
-async function ensureSeed(db) {
-  const count = await db.collection('units').countDocuments();
-  if (count === 0) {
-    await db.collection('units').insertOne({ ...DEFAULT_UNIT });
-  }
-}
+//async function ensureSeed(db) {
+  //const count = await db.collection('units').countDocuments();
+  //if (count === 0) {
+    //await db.collection('units').insertOne({ ...DEFAULT_UNIT });
+  //}
+//}
 
 function json(data, status = 200) {
   return NextResponse.json(data, { status });
