@@ -36,17 +36,6 @@ function sanitizeMongoUrl(url) {
 
 const EFFECTIVE_MONGO_URI = sanitizeMongoUrl(MONGODB_URI);
 
-const DEFAULT_UNIT = {
-  id: 'seed-unit-001',
-  srNo: 1,
-  batchCode: 'NA',
-  productCategory: 'All products',
-  companyName: 'NITHYA AGENCIES',
-  address: 'PLOT NO:76, SY NO:1109/E, UPPARIGUDA (V), IBRAHIMPATNAM (M), R.R DIST',
-  email: 'nithyaagencieshyd@gmail.com',
-  createdAt: new Date('2025-06-01').toISOString()
-};
-
 let cachedClient = null;
 async function getDb() {
   if (!cachedClient) {
