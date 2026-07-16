@@ -137,33 +137,28 @@ async function handle(request, { params }) {
     }
 
     // DELETE UNIT (admin)
-    const deleteUnit = async (id) => {
-  if (!confirm('Delete this manufacturing unit?')) return;
+if (route.startsWith('/units/') && method === 'DELETE') {
+  console.log("========== DELETE REQUEST ==========");
+  console.log("route:", route);
+  console.log("pathArr:", pathArr);
 
-  try {
-    const res = await fetch(`/api/units/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const data = await res.json();
-
-    console.log(data);
-
-    if (data.success) {
-      toast.success("Deleted");
-      loadUnits();
-    } else {
-      toast.error(data.error || "Delete failed");
-    }
-  } catch (err) {
-    console.error(err);
-    toast.error("Network error");
+  if (!checkAuth(request)) {
+    console.log("Unauthorized");
+    return json({ error: "Unauthorized" }, 401);
   }
-};
 
+  const id = pathArr[1];
+  console.log("Deleting ID:", id);
+
+  const result = await db.collection("units").deleteOne({ id });
+
+  console.log("Delete result:", result);
+
+  return json({
+    success: result.deletedCount === 1,
+    deletedCount: result.deletedCount
+  });
+}
     // CONTACT
     if (route === '/contact' && method === 'POST') {
       const body = await readBody(request);
