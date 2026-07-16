@@ -1,22 +1,66 @@
 import { NextResponse } from 'next/server';
 import { MongoClient } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
-import QRCode from 'qrcode';
 
 const MONGO_URL = process.env.MONGO_URL;
-const DB_NAME = process.env.DB_NAME && process.env.DB_NAME !== 'your_database_name' ? process.env.DB_NAME : 'manasa_dairy';
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || '';
+const DB_NAME = process.env.DB_NAME && process.env.DB_NAME !== 'your_database_name' ? process.env.DB_NAME : 'manasa';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'manasa2025';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_TOKEN = 'manasa_admin_secret_token_2025';
 
+// Sanitize Mongo URI: strip angle-bracket placeholder wrap and URL-encode password
+// (handles passwords that contain '@', '<', '>' which break naive URI parsing)
+function sanitizeMongoUrl(url) {
+  if (!url) return url;
+  const protoMatch = url.match(/^(mongodb(?:\+srv)?:\/\/)/);
+  if (!protoMatch) return url;
+  const proto = protoMatch[0];
+  const rest = url.slice(proto.length);
+  const slashIdx = rest.indexOf('/');
+  const searchEnd = slashIdx === -1 ? rest.length : slashIdx;
+  const atIdx = rest.lastIndexOf('@', searchEnd - 1);
+  if (atIdx === -1) return url;
+  const credentials = rest.slice(0, atIdx);
+  const hostAndRest = rest.slice(atIdx);
+  const colonIdx = credentials.indexOf(':');
+  if (colonIdx === -1) return url;
+  const user = credentials.slice(0, colonIdx);
+  let pass = credentials.slice(colonIdx + 1);
+  if (pass.startsWith('<') && pass.endsWith('>')) pass = pass.slice(1, -1);
+  // Only encode if not already encoded (no % sequences that decode cleanly)
+  try {
+    if (decodeURIComponent(pass) === pass) pass = encodeURIComponent(pass);
+  } catch { pass = encodeURIComponent(pass); }
+  return proto + user + ':' + pass + hostAndRest;
+}
+
+const EFFECTIVE_MONGO_URL = sanitizeMongoUrl(MONGO_URL);
+
+const DEFAULT_UNIT = {
+  id: 'seed-unit-001',
+  srNo: 1,
+  batchCode: 'NA',
+  productCategory: 'All products',
+  companyName: 'NITHYA AGENCIES',
+  address: 'PLOT NO:76, SY NO:1109/E, UPPARIGUDA (V), IBRAHIMPATNAM (M), R.R DIST',
+  email: 'nithyaagencieshyd@gmail.com',
+  createdAt: new Date('2025-06-01').toISOString()
+};
+
 let cachedClient = null;
 async function getDb() {
   if (!cachedClient) {
-    cachedClient = new MongoClient(MONGO_URL);
+    cachedClient = new MongoClient(EFFECTIVE_MONGO_URL);
     await cachedClient.connect();
   }
   return cachedClient.db(DB_NAME);
+}
+
+async function ensureSeed(db) {
+  const count = await db.collection('units').countDocuments();
+  if (count === 0) {
+    await db.collection('units').insertOne({ ...DEFAULT_UNIT });
+  }
 }
 
 function json(data, status = 200) {
@@ -42,7 +86,6 @@ async function handle(request, { params }) {
   try {
     const db = await getDb();
 
-    // Health
     if (route === '/' || route === '/health') {
       return json({ ok: true, service: 'Manasa Dairy API' });
     }
@@ -56,63 +99,64 @@ async function handle(request, { params }) {
       return json({ success: false, error: 'Invalid credentials' }, 401);
     }
 
-    // CREATE BATCH (admin)
-    if (route === '/batches' && method === 'POST') {
+    // LIST MANUFACTURING UNITS (public)
+    if (route === '/units' && method === 'GET') {
+      await ensureSeed(db);
+      const list = await db.collection('units').find({}, { projection: { _id: 0 } }).sort({ srNo: 1, createdAt: 1 }).toArray();
+      return json({ units: list });
+    }
+
+    // CREATE UNIT (admin)
+    if (route === '/units' && method === 'POST') {
       if (!checkAuth(request)) return json({ error: 'Unauthorized' }, 401);
       const body = await readBody(request);
-      const { productName, manufacturingLocation, quantity, notes } = body;
-      if (!productName || !manufacturingLocation) {
-        return json({ error: 'Product name and manufacturing location are required' }, 400);
+      const { srNo, batchCode, productCategory, companyName, address, email } = body;
+      if (!batchCode || !address) {
+        return json({ error: 'Batch code and address are required' }, 400);
       }
-      const id = uuidv4();
-      const now = new Date();
-      const dateStr = now.toISOString().slice(0, 10).replaceAll('-', '');
-      const short = id.split('-')[0].toUpperCase();
-      const batchNumber = `MD-${dateStr}-${short}`;
-      const verifyUrl = `${BASE_URL}/verify/${id}`;
-      const qrDataUrl = await QRCode.toDataURL(verifyUrl, { width: 400, margin: 2, color: { dark: '#1E3A8A', light: '#ffffff' } });
-      const batch = {
-        id,
-        batchNumber,
-        productName,
-        manufacturingLocation,
-        quantity: quantity || '',
-        notes: notes || '',
-        verifyUrl,
-        qrDataUrl,
-        authentic: true,
-        createdAt: now.toISOString()
+      // Auto-compute next srNo if not provided
+      let finalSrNo = Number(srNo);
+      if (!finalSrNo || Number.isNaN(finalSrNo)) {
+        const last = await db.collection('units').find({}).sort({ srNo: -1 }).limit(1).toArray();
+        finalSrNo = last.length ? (Number(last[0].srNo) || 0) + 1 : 1;
+      }
+      const unit = {
+        id: uuidv4(),
+        srNo: finalSrNo,
+        batchCode: String(batchCode).toUpperCase(),
+        productCategory: productCategory || 'All products',
+        companyName: companyName || '',
+        address,
+        email: email || '',
+        createdAt: new Date().toISOString()
       };
-      await db.collection('batches').insertOne(batch);
-      return json({ success: true, batch });
+      await db.collection('units').insertOne(unit);
+      return json({ success: true, unit });
     }
 
-    // LIST BATCHES (admin)
-    if (route === '/batches' && method === 'GET') {
-      if (!checkAuth(request)) return json({ error: 'Unauthorized' }, 401);
-      const list = await db.collection('batches').find({}, { projection: { _id: 0 } }).sort({ createdAt: -1 }).toArray();
-      return json({ batches: list });
-    }
-
-    // DELETE BATCH (admin)
-    if (route.startsWith('/batches/') && method === 'DELETE') {
+    // UPDATE UNIT (admin)
+    if (route.startsWith('/units/') && method === 'PUT') {
       if (!checkAuth(request)) return json({ error: 'Unauthorized' }, 401);
       const id = pathArr[1];
-      await db.collection('batches').deleteOne({ id });
+      const body = await readBody(request);
+      const update = {};
+      ['srNo', 'batchCode', 'productCategory', 'companyName', 'address', 'email'].forEach((k) => {
+        if (body[k] !== undefined) update[k] = k === 'srNo' ? Number(body[k]) : (k === 'batchCode' ? String(body[k]).toUpperCase() : body[k]);
+      });
+      await db.collection('units').updateOne({ id }, { $set: update });
+      const updated = await db.collection('units').findOne({ id }, { projection: { _id: 0 } });
+      return json({ success: true, unit: updated });
+    }
+
+    // DELETE UNIT (admin)
+    if (route.startsWith('/units/') && method === 'DELETE') {
+      if (!checkAuth(request)) return json({ error: 'Unauthorized' }, 401);
+      const id = pathArr[1];
+      await db.collection('units').deleteOne({ id });
       return json({ success: true });
     }
 
-    // PUBLIC VERIFY
-    if (route.startsWith('/verify/') && method === 'GET') {
-      const id = pathArr[1];
-      const b = await db.collection('batches').findOne({ id }, { projection: { _id: 0 } });
-      if (!b) {
-        return json({ found: false, authentic: false, error: 'Batch not found. This product may not be genuine.' }, 404);
-      }
-      return json({ found: true, authentic: true, batch: b });
-    }
-
-    // CONTACT SUBMISSIONS
+    // CONTACT
     if (route === '/contact' && method === 'POST') {
       const body = await readBody(request);
       const { name, email, phone, message } = body;

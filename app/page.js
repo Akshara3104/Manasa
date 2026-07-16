@@ -26,7 +26,7 @@ export default function HomePage() {
               with a unique QR code you can verify in seconds.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/verify">
+              <Link href="/manufacturing-units">
                 <Button size="lg" className="bg-blue-900 hover:bg-blue-800">
                   <QrCode className="mr-2 h-5 w-5" /> Verify a Product
                 </Button>
@@ -114,7 +114,7 @@ export default function HomePage() {
               <li className="flex gap-2"><CheckCircle2 className="h-5 w-5 shrink-0" /> Authenticity guaranteed</li>
             </ul>
             <div className="mt-6">
-              <Link href="/verify">
+              <Link href="/manufacturing-units">
                 <Button size="lg" className="bg-white text-blue-800 hover:bg-blue-50">
                   <QrCode className="mr-2 h-5 w-5" /> Go to Verification
                 </Button>

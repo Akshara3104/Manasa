@@ -12,7 +12,7 @@ const links = [
   { href: '/products', label: 'Products' },
   { href: '/quality', label: 'Quality' },
   { href: '/gallery', label: 'Gallery' },
-  { href: '/verify', label: 'Verify QR' },
+  { href: '/manufacturing-units', label: 'Manufacturing Units' },
   { href: '/contact', label: 'Contact' }
 ];
 
