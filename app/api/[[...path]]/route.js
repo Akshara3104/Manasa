@@ -3,9 +3,9 @@ import { MongoClient } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const DB_NAME = process.env.DB_NAME && process.env.DB_NAME !== 'your_database_name' ? process.env.DB_NAME : 'manasa_dairy';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ||;
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME ||;
+const DB_NAME = process.env.DB_NAME || 'manasa_dairy';
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
 // Sanitize Mongo URI: strip angle-bracket placeholder wrap and URL-encode password
