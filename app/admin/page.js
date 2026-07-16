@@ -107,8 +107,6 @@ export default function AdminPage() {
         body: JSON.stringify(form)
       });
       const j = await res.json();
-      console.log("Response status:", res.status);
-console.log("Response body:", j);
       if (j.success) {
         toast.success(editingId ? 'Unit updated' : 'Unit added');
         setForm(emptyForm);
