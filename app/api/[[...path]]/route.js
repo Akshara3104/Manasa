@@ -149,21 +149,32 @@ async function handle(request, { params }) {
     }
 
     // DELETE UNIT (admin)
-    if (route.startsWith('/units/') && method === 'DELETE') {
-      if (!checkAuth(request)) return json({ error: 'Unauthorized' }, 401);
-      const id = pathArr[1];
+    const deleteUnit = async (id) => {
+  if (!confirm('Delete this manufacturing unit?')) return;
 
-console.log("Deleting ID:", id);
+  try {
+    const res = await fetch(`/api/units/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
 
-const result = await db.collection("units").deleteOne({ id });
+    const data = await res.json();
 
-console.log(result);
+    console.log(data);
 
-return json({
-  success: true,
-  deletedCount: result.deletedCount
-});
+    if (data.success) {
+      toast.success("Deleted");
+      loadUnits();
+    } else {
+      toast.error(data.error || "Delete failed");
     }
+  } catch (err) {
+    console.error(err);
+    toast.error("Network error");
+  }
+};
 
     // CONTACT
     if (route === '/contact' && method === 'POST') {
