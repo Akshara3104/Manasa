@@ -101,7 +101,6 @@ async function handle(request, { params }) {
 
     // LIST MANUFACTURING UNITS (public)
     if (route === '/units' && method === 'GET') {
-      await ensureSeed(db);
       const list = await db.collection('units').find({}, { projection: { _id: 0 } }).sort({ srNo: 1, createdAt: 1 }).toArray();
       return json({ units: list });
     }
