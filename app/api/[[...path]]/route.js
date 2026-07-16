@@ -138,21 +138,19 @@ async function handle(request, { params }) {
 
     // DELETE UNIT (admin)
 if (route.startsWith('/units/') && method === 'DELETE') {
-  console.log("========== DELETE REQUEST ==========");
-  console.log("route:", route);
-  console.log("pathArr:", pathArr);
+
 
   if (!checkAuth(request)) {
-    console.log("Unauthorized");
+    
     return json({ error: "Unauthorized" }, 401);
   }
 
   const id = pathArr[1];
-  console.log("Deleting ID:", id);
+  
 
   const result = await db.collection("units").deleteOne({ id });
 
-  console.log("Delete result:", result);
+  
 
   return json({
     success: result.deletedCount === 1,
