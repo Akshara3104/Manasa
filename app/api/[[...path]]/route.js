@@ -152,8 +152,17 @@ async function handle(request, { params }) {
     if (route.startsWith('/units/') && method === 'DELETE') {
       if (!checkAuth(request)) return json({ error: 'Unauthorized' }, 401);
       const id = pathArr[1];
-      await db.collection('units').deleteOne({ id });
-      return json({ success: true });
+
+console.log("Deleting ID:", id);
+
+const result = await db.collection("units").deleteOne({ id });
+
+console.log(result);
+
+return json({
+  success: true,
+  deletedCount: result.deletedCount
+});
     }
 
     // CONTACT
