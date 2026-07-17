@@ -24,8 +24,7 @@ export default function SiteFooter() {
           <h4 className="mb-3 text-sm font-semibold text-blue-900">Products</h4>
           <ul className="space-y-2 text-sm text-slate-600">
             <li>Fresh Milk</li>
-            <li>Curd</li>
-            <li>Ghee</li>
+            <li>Curd & Ghee</li>
             <li>Paneer & Kova</li>
           </ul>
         </div>
