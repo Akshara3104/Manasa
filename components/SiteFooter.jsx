@@ -26,8 +26,7 @@ export default function SiteFooter() {
             <li>Fresh Milk</li>
             <li>Curd</li>
             <li>Ghee</li>
-            <li>Paneer</li>
-            <li>Kova</li>
+            <li>Paneer & Kova</li>
           </ul>
         </div>
 
