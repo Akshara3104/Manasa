@@ -12,10 +12,6 @@ async function fetchUnits() {
 
 export default async function ManufacturingUnitsPage() {
   const units = await fetchUnits();
-console.log("BASE:", process.env.NEXT_PUBLIC_BASE_URL);
-console.log("URL:", `${process.env.NEXT_PUBLIC_BASE_URL}/api/units`);
-console.log("STATUS:", res.status);
-console.log(await res.text());
   return (
     <div>
       <section className="bg-gradient-to-b from-blue-50 to-white py-14">
