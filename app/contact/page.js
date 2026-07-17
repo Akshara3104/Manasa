@@ -77,9 +77,9 @@ export default function ContactPage() {
 
         <div className="space-y-4">
           {[
-            { icon: MapPin, t: 'Address', d: 'Manasa Dairy Farms, Andhra Pradesh, India — 500001' },
-            { icon: Phone, t: 'Phone', d: '+91 98765 43210' },
-            { icon: Mail, t: 'Email', d: 'hello@manasadairy.com' }
+            { icon: MapPin, t: 'Address', d: 'PLOT NO:76, SY NO:1109/E, UPPARIGUDA (V), IBRAHIMPATNAM (M), R.R DIST' },
+            { icon: Phone, t: 'Phone', d: '+91 7032996099' },
+            { icon: Mail, t: 'Email', d: 'info@manasadairy.com' }
           ].map((c) => (
             <Card key={c.t} className="border-blue-100">
               <CardContent className="flex items-start gap-4 p-6">
