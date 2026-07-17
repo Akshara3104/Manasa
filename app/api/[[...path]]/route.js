@@ -72,6 +72,13 @@ async function handle(request, { params }) {
   const route = '/' + pathArr.join('/');
   const method = request.method;
 
+  console.log("========== API REQUEST ==========");
+  console.log("Method:", method);
+  console.log("Route:", route);
+  console.log("Path:", pathArr);
+  console.log("DB_NAME:", DB_NAME);
+  console.log("MONGO URI exists:", !!MONGODB_URI);
+
   try {
     const db = await getDb();
 
