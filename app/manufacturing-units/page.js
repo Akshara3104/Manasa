@@ -1,13 +1,18 @@
 async function fetchUnits() {
-  try {
-    const base = process.env.NEXT_PUBLIC_BASE_URL || '';
-    const res = await fetch(`${base}/api/units`, { cache: 'no-store' });
-    if (!res.ok) return [];
-    const j = await res.json();
-    return j.units || [];
-  } catch {
-    return [];
-  }
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/units`;
+
+  console.log("Fetching:", url);
+
+  const res = await fetch(url, {
+    cache: "no-store",
+  });
+
+  console.log("Status:", res.status);
+
+  const text = await res.text();
+  console.log("Body:", text);
+
+  return JSON.parse(text).units || [];
 }
 
 export default async function ManufacturingUnitsPage() {
