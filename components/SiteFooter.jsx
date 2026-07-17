@@ -34,9 +34,9 @@ export default function SiteFooter() {
         <div>
           <h4 className="mb-3 text-sm font-semibold text-blue-900">Contact</h4>
           <ul className="space-y-2 text-sm text-slate-600">
-            <li className="flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 text-blue-800" />Manasa Dairy Farms, Andhra Pradesh, India</li>
-            <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-blue-800" />+91 98765 43210</li>
-            <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-blue-800" />hello@manasadairy.com</li>
+            <li className="flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 text-blue-800" />PLOT NO:76, SY NO:1109/E, UPPARIGUDA (V), IBRAHIMPATNAM (M), R.R DIST</li>
+            <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-blue-800" />+91 7032996099</li>
+            <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-blue-800" />info@manasadairy.com</li>
           </ul>
         </div>
       </div>
